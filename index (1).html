@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWESOME INVOICE | Awesome Tech Solution</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<div id="toastBox"></div>
+
+<!-- ===================== LOGIN PAGE ===================== -->
+<div id="loginPage" class="login-page">
+  <div class="login-bg-shapes">
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://i.ibb.co/Gf0sRzN6/IMG-20260404-WA0039-1-removebg-preview.webp" alt="Awesome Tech Logo" />
+    </div>
+    <h1>AWESOME INVOICE</h1>
+    <p class="login-tagline">Awesome Tech Solution</p>
+    <p class="login-sub">Invoice Management System</p>
+
+    <div class="field-wrap">
+      <span class="ficon">✉</span>
+      <input type="email" id="loginEmail" placeholder="Email Address" />
+    </div>
+    <div class="field-wrap">
+      <span class="ficon">🔒</span>
+      <input type="password" id="loginPass" placeholder="Password"
+             onkeyup="if(event.key==='Enter') App.login()" />
+    </div>
+    <button class="btn-login" onclick="App.login()">
+      LOGIN TO SYSTEM
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+    <p class="dev-tag">Awesome Tech Solution · v1.0</p>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="appPage" class="app" style="display:none">
+
+  <div class="sidebar-overlay" id="overlay" onclick="UI.closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <img src="https://i.ibb.co/Gf0sRzN6/IMG-20260404-WA0039-1-removebg-preview.webp" alt="Logo" />
+      <div class="sb-name">AWESOME TECH</div>
+      <div class="sb-sub">SOLUTION</div>
+      <button class="sb-close" onclick="UI.closeSidebar()">✕</button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-item active" id="nav-invoice" onclick="UI.setView('invoice')">
+        <span class="nicon">🧾</span>
+        <span class="nlabel">New Invoice</span>
+      </div>
+      <div class="nav-item" id="nav-history" onclick="UI.setView('history')">
+        <span class="nicon">📂</span>
+        <span class="nlabel">History</span>
+        <span class="nbadge" id="histBadge" style="display:none">0</span>
+      </div>
+    </nav>
+
+    <div class="sb-foot">
+      <button class="btn-logout" onclick="App.logout()">🚪 Logout</button>
+      <p>Awesome Tech Solution v1.0</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="UI.openSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="topbar-title" id="topbarTitle">AWESOME INVOICE</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ====== VIEW: NEW INVOICE ====== -->
+      <div id="view-invoice">
+        <div class="page-head">
+          <div>
+            <h2>🧾 New Invoice</h2>
+            <p class="page-sub">Awesome Tech Solution — Invoice System</p>
+          </div>
+          <select class="form-select" id="invDtype">
+            <option value="PROFORMA INVOICE">PROFORMA INVOICE</option>
+            <option value="TAX INVOICE">TAX INVOICE</option>
+            <option value="DELIVERY NOTE">DELIVERY NOTE</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <!-- Customer Details -->
+          <div class="section-label">👤 Customer Details</div>
+          <div class="grid-3 mb18">
+            <div>
+              <label class="flabel">Customer Name</label>
+              <input class="form-input" id="c_name" placeholder="e.g. John Mwangi" />
+            </div>
+            <div>
+              <label class="flabel">Contact / Simu</label>
+              <input class="form-input" id="c_contact" placeholder="e.g. 0712 345 678" />
+            </div>
+            <div>
+              <label class="flabel">Location / Mahali</label>
+              <input class="form-input" id="c_location" placeholder="e.g. Dar es Salaam" />
+            </div>
+          </div>
+
+          <!-- Invoice Meta -->
+          <div class="section-label">📋 Invoice Details</div>
+          <div class="grid-3 mb18">
+            <div>
+              <label class="flabel">Invoice Number</label>
+              <input class="form-input" id="inv_number" />
+            </div>
+            <div>
+              <label class="flabel">Date</label>
+              <input class="form-input" type="date" id="inv_date" />
+            </div>
+            <div>
+              <label class="flabel">Invoice Title</label>
+              <input class="form-input" id="inv_title" placeholder="e.g. CCTV Camera Installation" />
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="section-label">📦 Items / Vitu</div>
+          <div class="tbl-wrap">
+            <table class="items-tbl">
+              <thead>
+                <tr>
+                  <th style="width:9%">Qty</th>
+                  <th>Description / Maelezo</th>
+                  <th style="width:20%">Price per Item (TZS)</th>
+                  <th style="width:18%">Amount (TZS)</th>
+                  <th style="width:5%"></th>
+                </tr>
+              </thead>
+              <tbody id="inv_tbody"></tbody>
+            </table>
+          </div>
+          <button class="btn-add-row" onclick="Rows.add()">+ Add Item</button>
+
+          <!-- Subtotal + Labour -->
+          <div class="totals-section">
+            <div class="totals-table">
+              <div class="total-row">
+                <span class="total-label">Subtotal</span>
+                <span class="total-value">TZS <span id="inv_subtotal">0</span></span>
+              </div>
+              <div class="total-row labour-row">
+                <span class="total-label">
+                  <select class="labour-select" id="labourType">
+                    <option value="Labour Cost">Labour Cost</option>
+                    <option value="Consultation Fee">Consultation Fee</option>
+                    <option value="Installation Fee">Installation Fee</option>
+                    <option value="Service Fee">Service Fee</option>
+                  </select>
+                </span>
+                <span class="total-value labour-input-wrap">
+                  TZS <input class="labour-input" type="number" id="labourCost" value="0" min="0" oninput="Rows.calcTotals()" placeholder="0" />
+                </span>
+              </div>
+              <div class="total-row grand-row">
+                <span class="total-label">GRAND TOTAL</span>
+                <span class="total-value grand-val">TZS <span id="inv_total">0</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-btns">
+            <button class="btn-act btn-print" onclick="Docs.save('print')">🖨️ Print</button>
+            <button class="btn-act btn-pdf"   onclick="Docs.save('pdf')">📄 PDF</button>
+            <button class="btn-act btn-word"  onclick="Docs.save('word')">📝 Word</button>
+          </div>
+        </div>
+      </div><!-- /view-invoice -->
+
+      <!-- ====== VIEW: HISTORY ====== -->
+      <div id="view-history" style="display:none">
+        <div class="page-head">
+          <div>
+            <h2>📂 Invoice History</h2>
+            <p class="page-sub">Records zote za invoices</p>
+          </div>
+          <button class="btn-danger-sm" onclick="Hist.clearAll()">🗑️ Futa Zote</button>
+        </div>
+
+        <div class="card">
+          <div id="histEmpty" class="empty-state" style="display:none">
+            📭 Hakuna records bado. Unda invoice yako ya kwanza!
+          </div>
+          <div class="tbl-wrap" id="histWrap">
+            <table class="hist-tbl">
+              <thead>
+                <tr>
+                  <th>Nambari</th>
+                  <th>Mteja</th>
+                  <th>Aina</th>
+                  <th>Tarehe</th>
+                  <th>Grand Total (TZS)</th>
+                  <th>Vitendo</th>
+                </tr>
+              </thead>
+              <tbody id="histTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /view-history -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal" style="display:none">
+  <div class="modal-box">
+    <h3>✏️ Edit Invoice</h3>
+    <div class="grid-3 mb14">
+      <div>
+        <label class="flabel">Customer Name</label>
+        <input class="form-input" id="e_name" />
+      </div>
+      <div>
+        <label class="flabel">Contact</label>
+        <input class="form-input" id="e_contact" />
+      </div>
+      <div>
+        <label class="flabel">Location</label>
+        <input class="form-input" id="e_location" />
+      </div>
+    </div>
+    <div class="grid-3 mb14">
+      <div>
+        <label class="flabel">Invoice No.</label>
+        <input class="form-input" id="e_number" />
+      </div>
+      <div>
+        <label class="flabel">Tarehe</label>
+        <input class="form-input" type="date" id="e_date" />
+      </div>
+      <div>
+        <label class="flabel">Aina ya Hati</label>
+        <select class="form-select" id="e_type" style="width:100%">
+          <option>PROFORMA INVOICE</option>
+          <option>TAX INVOICE</option>
+          <option>DELIVERY NOTE</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb14">
+      <label class="flabel">Title</label>
+      <input class="form-input" id="e_title" />
+    </div>
+    <p class="modal-hint">Kwa mabadiliko ya items, rudi kwenye form uunde upya.</p>
+    <div class="modal-acts">
+      <button class="btn-modal-save" onclick="Hist.saveEdit()">💾 Hifadhi</button>
+      <button class="btn-modal-cancel" onclick="Hist.closeEdit()">Ghairi</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT / PDF ZONE (hidden) -->
+<div id="printZone"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
